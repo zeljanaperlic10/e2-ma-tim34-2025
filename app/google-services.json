@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862761960605",
+    "project_id": "mobilne-2fba8",
+    "storage_bucket": "mobilne-2fba8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862761960605:android:06365c5de5cc75da908074",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDywSHIGwsEa_1gGEmysZmGyofuaY7cPJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
