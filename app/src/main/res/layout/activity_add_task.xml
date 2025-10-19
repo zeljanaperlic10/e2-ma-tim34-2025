@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Naziv zadatka -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Naziv zadatka" />
+        <EditText
+            android:id="@+id/inputTaskName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Unesi naziv" />
+
+        <!-- Opis zadatka -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opis zadatka (opciono)"
+            android:layout_marginTop="8dp"/>
+        <EditText
+            android:id="@+id/inputTaskDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Unesi opis" />
+
+        <!-- Kategorija -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kategorija"
+            android:layout_marginTop="8dp"/>
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btnCategoryColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Boja kategorije"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Učestalost -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Učestalost"
+            android:layout_marginTop="8dp"/>
+        <RadioGroup
+            android:id="@+id/radioGroupFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radioOneTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jednokratni" />
+            <RadioButton
+                android:id="@+id/radioRepeating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ponavljajući" />
+        </RadioGroup>
+
+        <!-- Opcije za ponavljanje -->
+        <LinearLayout
+            android:id="@+id/layoutRepeatOptions"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:paddingLeft="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Interval ponavljanja" />
+            <EditText
+                android:id="@+id/inputRepeatInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Unesi interval (npr. 1,2,3…)" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jedinica ponavljanja"
+                android:layout_marginTop="4dp"/>
+            <Spinner
+                android:id="@+id/spinnerRepeatUnit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnSelectStartDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datum početka"
+                android:layout_marginTop="4dp"/>
+
+            <!-- NOVO: dugme za datum završetka -->
+            <Button
+                android:id="@+id/btnSelectEndDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datum završetka"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <!-- Težina -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Težina zadatka"
+            android:layout_marginTop="8dp"/>
+        <Spinner
+            android:id="@+id/spinnerDifficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Bitnost -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bitnost zadatka"
+            android:layout_marginTop="8dp"/>
+        <Spinner
+            android:id="@+id/spinnerImportance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Dugme za dodavanje -->
+        <Button
+            android:id="@+id/btnAddTask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dodaj zadatak"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>
+

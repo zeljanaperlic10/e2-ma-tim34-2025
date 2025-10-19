@@ -43,6 +43,9 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(v -> loginUser());
         goToRegisterBtn.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+
+
+
     }
 
     private void loginUser() {
@@ -77,4 +80,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(this, HomeActivity.class)); // promenjeno sa MainActivity
         finish();
     }
+
+
 }

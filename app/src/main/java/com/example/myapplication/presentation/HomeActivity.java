@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private Button logoutBtn;
+    private Button logoutBtn, addTaskBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,13 +19,25 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         logoutBtn = findViewById(R.id.logoutBtn);
+        addTaskBtn = findViewById(R.id.addTaskBtn);
 
+        // Logout dugme
         logoutBtn.setOnClickListener(v -> {
-            // Logout
             FirebaseAuth.getInstance().signOut();
-            // Vrati korisnika na LoginActivity
             startActivity(new Intent(HomeActivity.this, LoginActivity.class));
             finish();
         });
+
+        // Dodaj zadatak dugme
+        addTaskBtn.setOnClickListener(v -> {
+            // Preuzmi UID trenutnog korisnika
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            // Otvori CreateTaskActivity i prosledi userId
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            intent.putExtra("USER_ID", userId);
+            startActivity(intent);
+        });
     }
 }
+
