@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:background="@android:color/white">
 
+
     <!-- Prazan layout -->
 
 </LinearLayout>

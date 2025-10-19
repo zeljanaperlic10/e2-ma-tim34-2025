@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
+import com.example.myapplication.presentation.fragments.FriendsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.example.myapplication.presentation.fragments.HomeFragment;
@@ -20,6 +21,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private BottomNavigationView bottomNavigation;
+    //private Button  addTaskBtn;
 
 
     @Override
@@ -28,6 +30,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        //addTaskBtn = findViewById(R.id.addTaskBtn);
 
         // Učitaj početni fragment (Home)
         if (savedInstanceState == null) {
@@ -49,6 +52,9 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }
+            else if (itemId == R.id.nav_friends) {
+                selectedFragment = new FriendsFragment();
+            }
 
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
@@ -58,9 +64,9 @@ public class HomeActivity extends AppCompatActivity {
 
             return true;
 
-
+        });
         // Dodaj zadatak dugme
-        addTaskBtn.setOnClickListener(v -> {
+       /* addTaskBtn.setOnClickListener(v -> {
             // Preuzmi UID trenutnog korisnika
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -68,7 +74,6 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
             intent.putExtra("USER_ID", userId);
             startActivity(intent);
-        });
-    }
-}
+        });*/
+}}
 
