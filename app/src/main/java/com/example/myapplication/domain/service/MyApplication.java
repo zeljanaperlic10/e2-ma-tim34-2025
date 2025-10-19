@@ -23,6 +23,10 @@ public class MyApplication extends Application {
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
 
         // Traži dozvolu za notifikacije
-        OneSignal.getNotifications().requestPermission(true, Continue.none());
+        try {
+            OneSignal.getNotifications().requestPermission(true, Continue.none());
+        } catch (IllegalStateException e) {
+            Log.e("OneSignalCheck", "SDK nije inicijalizovan!");
+        }
     }
 }
