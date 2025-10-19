@@ -5,28 +5,59 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.example.myapplication.presentation.fragments.HomeFragment;
+import com.example.myapplication.presentation.fragments.ProfileFragment;
+import com.example.myapplication.presentation.fragments.StatsFragment;
+import com.example.myapplication.presentation.fragments.StoreFragment;
+
 
 public class HomeActivity extends AppCompatActivity {
 
-    private Button logoutBtn, addTaskBtn;
+
+    private BottomNavigationView bottomNavigation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        logoutBtn = findViewById(R.id.logoutBtn);
-        addTaskBtn = findViewById(R.id.addTaskBtn);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        // Logout dugme
-        logoutBtn.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-            finish();
-        });
+        // Učitaj početni fragment (Home)
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, new HomeFragment())
+                    .commit();
+        }
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.nav_store) {
+                selectedFragment = new StoreFragment();
+            } else if (itemId == R.id.nav_stats) {
+                selectedFragment = new StatsFragment();
+            } else if (itemId == R.id.nav_profile) {
+                selectedFragment = new ProfileFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, selectedFragment)
+                        .commit();
+            }
+
+            return true;
+
 
         // Dodaj zadatak dugme
         addTaskBtn.setOnClickListener(v -> {

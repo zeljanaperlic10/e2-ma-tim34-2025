@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+
 }
 
 android {
@@ -39,6 +40,11 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation 'com.google.firebase:firebase-firestore:25.1.1'
     implementation 'com.google.firebase:firebase-auth:23.1.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.zxing:core:3.5.1' // Za QR kod
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
 }
 
 apply plugin: 'com.google.gms.google-services'

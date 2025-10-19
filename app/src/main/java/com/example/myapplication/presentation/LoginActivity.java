@@ -13,12 +13,15 @@ import com.example.myapplication.R;
 import com.example.myapplication.util.SharedPrefsManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.onesignal.OneSignal;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField;
     private Button loginBtn, goToRegisterBtn;
     private FirebaseAuth auth;
+    private FirebaseFirestore db;
     private SharedPrefsManager prefsManager;
 
     @Override
@@ -27,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         prefsManager = new SharedPrefsManager(this);
 
         emailField = findViewById(R.id.email);
@@ -62,6 +66,21 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null && user.isEmailVerified()) {
+                            String userId = user.getUid();
+                            // Poveži OneSignal sa Firebase User ID
+                            OneSignal.login(userId);
+
+                            // Čuvaj OneSignal Player ID u Firestore (opciono ali korisno)
+                            String oneSignalPlayerId = OneSignal.getUser().getOnesignalId();
+                            if (oneSignalPlayerId != null) {
+                                db.collection("users").document(userId)
+                                        .update("oneSignalId", oneSignalPlayerId)
+                                        .addOnFailureListener(e -> {
+                                            // Ako field ne postoji, kreiraj ga
+                                            db.collection("users").document(userId)
+                                                    .update("oneSignalId", oneSignalPlayerId);
+                                        });
+                            }
                             // čuvamo status u SharedPreferences
                             prefsManager.saveUserSession(user.getUid(), email);
                             Toast.makeText(this, "Uspešno prijavljivanje!", Toast.LENGTH_SHORT).show();

@@ -109,7 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Molimo izaberi avatar!", Toast.LENGTH_SHORT).show();
             return;
         }
-        String[] avatarNames = {"person2", "person5", "person4", "person3", "person1"};
+        String[] avatarNames = {null, "person2", "person5", "person4", "person3", "person1"};
         String avatar = avatarNames[selectedPosition];
 
         if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || username.isEmpty()) {
