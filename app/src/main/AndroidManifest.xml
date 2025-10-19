@@ -31,6 +31,12 @@
 
         <activity android:name=".presentation.RegisterActivity" />
         <activity android:name=".presentation.HomeActivity" />
+        <activity
+            android:name=".presentation.AddTaskActivity"
+            android:label="Dodaj Zadatak"
+            android:exported="true" />
+
+
         <activity android:name=".MainActivity" />
 
     </application>

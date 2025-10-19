@@ -18,7 +18,9 @@ import com.example.myapplication.presentation.fragments.StoreFragment;
 
 public class HomeActivity extends AppCompatActivity {
 
+
     private BottomNavigationView bottomNavigation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,18 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             return true;
+
+
+        // Dodaj zadatak dugme
+        addTaskBtn.setOnClickListener(v -> {
+            // Preuzmi UID trenutnog korisnika
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            // Otvori CreateTaskActivity i prosledi userId
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            intent.putExtra("USER_ID", userId);
+            startActivity(intent);
         });
     }
 }
+
