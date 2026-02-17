@@ -1,7 +1,7 @@
 package com.example.myapplication.data.model;
 
 public class Task {
-    private int id;
+    private String firestoreId;
     private String name;
     private String description;
     private String category;
@@ -14,16 +14,19 @@ public class Task {
     private int difficultyXP;
     private int importanceXP;
     private int totalXP;
-    private String userId;          // ID korisnika koji je kreirao zadatak
-    private Long completedDate;     // vreme kada je zadatak završen / XP dodeljen
-    private Long createdTimestamp;  // vreme kada je zadatak kreiran
+    private String userId;
+    private Long completedDate;
+    private Long createdTimestamp;
+    private String status; // "ACTIVE", "DONE", "UNDONE", "PAUSED", "CANCELLED"
 
-    public Task() { }
+    public Task() {
+        this.status = "ACTIVE";
+    }
 
     public Task(String name, String description, String category, int categoryColor,
                 FrequencyType frequencyType, Integer repeatInterval, RepeatUnit repeatUnit,
                 Long startDate, Long endDate, int difficultyXP, int importanceXP,
-                String userId, Long completedDate, Long createdTimestamp) {
+                String userId, Long createdTimestamp) {
         this.name = name;
         this.description = description;
         this.category = category;
@@ -36,14 +39,13 @@ public class Task {
         this.difficultyXP = difficultyXP;
         this.importanceXP = importanceXP;
         this.userId = userId;
-        this.completedDate = completedDate;
         this.createdTimestamp = createdTimestamp;
+        this.status = "ACTIVE";
         updateTotalXP();
     }
 
-    // Getteri i setteri
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public String getFirestoreId() { return firestoreId; }
+    public void setFirestoreId(String firestoreId) { this.firestoreId = firestoreId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -73,16 +75,10 @@ public class Task {
     public void setEndDate(Long endDate) { this.endDate = endDate; }
 
     public int getDifficultyXP() { return difficultyXP; }
-    public void setDifficultyXP(int difficultyXP) {
-        this.difficultyXP = difficultyXP;
-        updateTotalXP();
-    }
+    public void setDifficultyXP(int difficultyXP) { this.difficultyXP = difficultyXP; updateTotalXP(); }
 
     public int getImportanceXP() { return importanceXP; }
-    public void setImportanceXP(int importanceXP) {
-        this.importanceXP = importanceXP;
-        updateTotalXP();
-    }
+    public void setImportanceXP(int importanceXP) { this.importanceXP = importanceXP; updateTotalXP(); }
 
     public int getTotalXP() { return totalXP; }
     public void setTotalXP(int totalXP) { this.totalXP = totalXP; }
@@ -96,32 +92,64 @@ public class Task {
     public Long getCreatedTimestamp() { return createdTimestamp; }
     public void setCreatedTimestamp(Long createdTimestamp) { this.createdTimestamp = createdTimestamp; }
 
-    // Helper metode za XP
-    public void setDifficultyByLevel(String level) {
-        switch(level) {
-            case "Veoma lak": this.difficultyXP = 1; break;
-            case "Lak": this.difficultyXP = 3; break;
-            case "Težak": this.difficultyXP = 7; break;
-            case "Ekstremno težak": this.difficultyXP = 20; break;
-        }
-        updateTotalXP();
-    }
-
-    public void setImportanceByLevel(String level) {
-        switch(level) {
-            case "Normalan": this.importanceXP = 1; break;
-            case "Važan": this.importanceXP = 3; break;
-            case "Ekstremno važan": this.importanceXP = 10; break;
-            case "Specijalan": this.importanceXP = 100; break;
-        }
-        updateTotalXP();
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     private void updateTotalXP() {
         this.totalXP = this.difficultyXP + this.importanceXP;
     }
 
-    // Enumi
+    public void setDifficultyByLabel(String level) {
+        switch (level) {
+            case "Veoma lak":       this.difficultyXP = 1;  break;
+            case "Lak":             this.difficultyXP = 3;  break;
+            case "Težak":           this.difficultyXP = 7;  break;
+            case "Ekstremno težak": this.difficultyXP = 20; break;
+        }
+        updateTotalXP();
+    }
+
+    public void setImportanceByLabel(String level) {
+        switch (level) {
+            case "Normalan":        this.importanceXP = 1;   break;
+            case "Važan":           this.importanceXP = 3;   break;
+            case "Ekstremno važan": this.importanceXP = 10;  break;
+            case "Specijalan":      this.importanceXP = 100; break;
+        }
+        updateTotalXP();
+    }
+
+    public String getDifficultyLabel() {
+        switch (difficultyXP) {
+            case 1:  return "Veoma lak";
+            case 3:  return "Lak";
+            case 7:  return "Težak";
+            case 20: return "Ekstremno težak";
+            default: return "Nepoznato";
+        }
+    }
+
+    public String getImportanceLabel() {
+        switch (importanceXP) {
+            case 1:   return "Normalan";
+            case 3:   return "Važan";
+            case 10:  return "Ekstremno važan";
+            case 100: return "Specijalan";
+            default:  return "Nepoznato";
+        }
+    }
+
+    public boolean canBeMarked() {
+        if (!"ACTIVE".equals(status)) return false;
+        if (startDate == null) return false;
+        long threeDaysMs = 3L * 24 * 60 * 60 * 1000;
+        return System.currentTimeMillis() - startDate <= threeDaysMs;
+    }
+
+    public boolean canBeEdited() {
+        return "ACTIVE".equals(status) || "PAUSED".equals(status);
+    }
+
     public enum FrequencyType { ONE_TIME, REPEATING }
     public enum RepeatUnit { DAY, WEEK }
 }

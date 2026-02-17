@@ -31,11 +31,27 @@
 
         <activity android:name=".presentation.RegisterActivity" />
         <activity android:name=".presentation.HomeActivity" />
+
         <activity
             android:name=".presentation.AddTaskActivity"
             android:label="Dodaj Zadatak"
             android:exported="true" />
 
+        <activity
+            android:name=".presentation.TaskListActivity"
+            android:label="Moji zadaci" />
+
+        <activity
+            android:name=".presentation.TaskDetailActivity"
+            android:label="Detalji zadatka" />
+
+        <activity
+            android:name=".presentation.EditTaskActivity"
+            android:label="Izmeni zadatak" />
+
+        <activity
+            android:name=".presentation.CategoriesActivity"
+            android:label="Kategorije" />
 
         <activity android:name=".MainActivity" />
 

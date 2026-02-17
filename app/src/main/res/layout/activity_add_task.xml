@@ -2,152 +2,185 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#F5F5F5">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Naziv zadatka -->
         <TextView
+            android:text="Novi zadatak"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginBottom="16dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Naziv zadatka" />
+            android:layout_height="wrap_content"/>
+
+        <!-- Naziv -->
+        <TextView android:text="Naziv *"
+            android:textColor="#616161"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
         <EditText
             android:id="@+id/inputTaskName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Unesi naziv" />
+            android:hint="Unesite naziv zadatka"
+            android:background="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"/>
 
-        <!-- Opis zadatka -->
-        <TextView
+        <!-- Opis -->
+        <TextView android:text="Opis (opciono)"
+            android:textColor="#616161"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Opis zadatka (opciono)"
-            android:layout_marginTop="8dp"/>
+            android:layout_height="wrap_content"/>
         <EditText
             android:id="@+id/inputTaskDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Unesi opis" />
+            android:hint="Unesite opis"
+            android:minLines="2"
+            android:background="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"/>
 
         <!-- Kategorija -->
-        <TextView
+        <TextView android:text="Kategorija *"
+            android:textColor="#616161"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kategorija"
-            android:layout_marginTop="8dp"/>
+            android:layout_height="wrap_content"/>
         <Spinner
             android:id="@+id/spinnerCategory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/btnCategoryColor"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Boja kategorije"
-            android:layout_marginTop="4dp"/>
+            android:background="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Težina -->
+        <TextView android:text="Težina *"
+            android:textColor="#616161"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spinnerDifficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Bitnost -->
+        <TextView android:text="Bitnost *"
+            android:textColor="#616161"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spinnerImportance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"/>
 
         <!-- Učestalost -->
-        <TextView
+        <TextView android:text="Učestalost *"
+            android:textColor="#616161"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Učestalost"
-            android:layout_marginTop="8dp"/>
+            android:layout_height="wrap_content"/>
         <RadioGroup
             android:id="@+id/radioGroupFrequency"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
             <RadioButton
                 android:id="@+id/radioOneTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Jednokratni" />
+                android:text="Jednokratni"
+                android:checked="true"/>
             <RadioButton
                 android:id="@+id/radioRepeating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ponavljajući" />
+                android:text="Ponavljajući"
+                android:layout_marginStart="16dp"/>
         </RadioGroup>
 
         <!-- Opcije za ponavljanje -->
         <LinearLayout
             android:id="@+id/layoutRepeatOptions"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:paddingLeft="8dp">
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <TextView
+            <TextView android:text="Interval ponavljanja"
+                android:textColor="#616161"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Interval ponavljanja" />
-            <EditText
-                android:id="@+id/inputRepeatInterval"
+                android:layout_height="wrap_content"/>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="Unesi interval (npr. 1,2,3…)" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Jedinica ponavljanja"
-                android:layout_marginTop="4dp"/>
-            <Spinner
-                android:id="@+id/spinnerRepeatUnit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/btnSelectStartDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Datum početka"
-                android:layout_marginTop="4dp"/>
-
-            <!-- NOVO: dugme za datum završetka -->
-            <Button
-                android:id="@+id/btnSelectEndDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Datum završetka"
-                android:layout_marginTop="4dp"
-                android:visibility="gone"/>
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+                <EditText
+                    android:id="@+id/inputRepeatInterval"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="npr. 2"
+                    android:inputType="number"
+                    android:background="@android:color/white"
+                    android:padding="10dp"/>
+                <Spinner
+                    android:id="@+id/spinnerRepeatUnit"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/white"
+                    android:padding="10dp"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Težina -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Težina zadatka"
-            android:layout_marginTop="8dp"/>
-        <Spinner
-            android:id="@+id/spinnerDifficulty"
+        <!-- Datum početka -->
+        <Button
+            android:id="@+id/btnSelectStartDate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- Bitnost -->
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bitnost zadatka"
-            android:layout_marginTop="8dp"/>
-        <Spinner
-            android:id="@+id/spinnerImportance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:text="Odaberi datum početka"
+            android:backgroundTint="#3F51B5"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="8dp"/>
 
-        <!-- Dugme za dodavanje -->
+        <!-- Datum završetka (samo za ponavljajuće) -->
+        <Button
+            android:id="@+id/btnSelectEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Odaberi datum završetka"
+            android:backgroundTint="#3F51B5"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Dodaj dugme -->
         <Button
             android:id="@+id/btnAddTask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dodaj zadatak"
-            android:layout_marginTop="16dp"/>
+            android:text="DODAJ ZADATAK"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:padding="14dp"/>
+
     </LinearLayout>
 </ScrollView>
 
