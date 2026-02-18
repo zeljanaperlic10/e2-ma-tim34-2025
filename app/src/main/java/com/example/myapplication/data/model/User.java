@@ -8,7 +8,24 @@ public class User {
     private boolean activated;
     private long registrationTime;
 
-    public User() {} // Firebase mora imati prazan konstruktor
+    // Napredovanje
+    private int level;
+    private int xp;
+    private int requiredXp;
+    private int coins;
+    private int pp;
+    private String title;
+    private long lastLevelUpTimestamp; // Početak trenutne etape
+
+    public User() {
+        this.level = 0;
+        this.xp = 0;
+        this.requiredXp = 200;
+        this.coins = 0;
+        this.pp = 40;
+        this.title = "Početnik";
+        this.lastLevelUpTimestamp = System.currentTimeMillis();
+    }
 
     public User(String id, String username, String email, String avatar, boolean activated, long registrationTime) {
         this.id = id;
@@ -17,53 +34,51 @@ public class User {
         this.avatar = avatar;
         this.activated = activated;
         this.registrationTime = registrationTime;
+        this.level = 0;
+        this.xp = 0;
+        this.requiredXp = 200;
+        this.coins = 0;
+        this.pp = 40;
+        this.title = "Početnik";
+        this.lastLevelUpTimestamp = System.currentTimeMillis();
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
-    public String getEmail() {
-        return email;
-    }
+    public boolean isActivated() { return activated; }
+    public void setActivated(boolean activated) { this.activated = activated; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public long getRegistrationTime() { return registrationTime; }
+    public void setRegistrationTime(long registrationTime) { this.registrationTime = registrationTime; }
 
-    public String getAvatar() {
-        return avatar;
-    }
+    public int getLevel() { return level; }
+    public void setLevel(int level) { this.level = level; }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+    public int getXp() { return xp; }
+    public void setXp(int xp) { this.xp = xp; }
 
-    public boolean isActivated() {
-        return activated;
-    }
+    public int getRequiredXp() { return requiredXp; }
+    public void setRequiredXp(int requiredXp) { this.requiredXp = requiredXp; }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
+    public int getCoins() { return coins; }
+    public void setCoins(int coins) { this.coins = coins; }
 
-    public long getRegistrationTime() {
-        return registrationTime;
-    }
+    public int getPp() { return pp; }
+    public void setPp(int pp) { this.pp = pp; }
 
-    public void setRegistrationTime(long registrationTime) {
-        this.registrationTime = registrationTime;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public long getLastLevelUpTimestamp() { return lastLevelUpTimestamp; }
+    public void setLastLevelUpTimestamp(long lastLevelUpTimestamp) { this.lastLevelUpTimestamp = lastLevelUpTimestamp; }
 }

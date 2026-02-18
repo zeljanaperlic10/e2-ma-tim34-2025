@@ -2,6 +2,7 @@ package com.example.myapplication.domain.service;
 
 import com.example.myapplication.data.model.Task;
 import com.example.myapplication.data.repository.TaskRepository;
+import com.example.myapplication.data.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +11,7 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository = new TaskRepository();
+    private final UserRepository userRepository = new UserRepository();
 
     // Dodavanje zadatka sa kvota proverom
     public void addTask(Task task, OnTaskOperation callback) {
@@ -104,14 +106,35 @@ public class TaskService {
             callback.onError("Zadatak ne može biti označen — prošlo je više od 3 dana!");
             return;
         }
+
         taskRepository.updateTaskStatus(
                 task.getFirestoreId(), "DONE",
                 System.currentTimeMillis(),
                 new TaskRepository.OnOperationComplete() {
                     @Override
-                    public void onSuccess() { callback.onSuccess("Zadatak označen kao urađen!"); }
+                    public void onSuccess() {
+                        // Dodaj XP korisniku
+                        userRepository.addXp(task.getUserId(), task.getTotalXP(), new UserRepository.OnXpAdded() {
+                            @Override
+                            public void onXpAdded() {
+                                callback.onSuccess("Zadatak označen kao urađen! +" + task.getTotalXP() + " XP");
+                            }
+
+                            @Override
+                            public void onLevelUp(int oldLevel, int newLevel, int oldPp, int newPp, String newTitle, int newRequiredXp) {
+                                callback.onLevelUp(oldLevel, newLevel, oldPp, newPp, newTitle, newRequiredXp);
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                callback.onSuccess("Zadatak urađen, ali greška sa XP: " + message);
+                            }
+                        });
+                    }
                     @Override
-                    public void onError(String message) { callback.onError(message); }
+                    public void onError(String message) {
+                        callback.onError(message);
+                    }
                 });
     }
 
@@ -256,6 +279,7 @@ public class TaskService {
     public interface OnTaskOperation {
         void onSuccess(String message);
         void onError(String message);
+        default void onLevelUp(int oldLevel, int newLevel, int oldPp, int newPp, String newTitle, int newRequiredXp) {}
     }
 }
 

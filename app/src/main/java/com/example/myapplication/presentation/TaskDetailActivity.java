@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.data.model.Task;
 import com.example.myapplication.domain.service.TaskService;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +37,6 @@ public class TaskDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
 
-        // Povezi view-ove
         tvDetailName = findViewById(R.id.tvDetailName);
         tvDetailStatus = findViewById(R.id.tvDetailStatus);
         tvDetailDescription = findViewById(R.id.tvDetailDescription);
@@ -56,13 +56,8 @@ public class TaskDetailActivity extends AppCompatActivity {
         btnEdit = findViewById(R.id.btnEdit);
         btnDelete = findViewById(R.id.btnDelete);
 
-        // Rekonstruiši Task objekat iz Intent podataka
         currentTask = buildTaskFromIntent();
-
-        // Prikaži podatke
         populateUI();
-
-        // Postavi dugmad
         setupButtons();
     }
 
@@ -85,40 +80,34 @@ public class TaskDetailActivity extends AppCompatActivity {
         task.setFrequencyType(freq != null && freq.equals("REPEATING") ?
                 Task.FrequencyType.REPEATING : Task.FrequencyType.ONE_TIME);
 
+        // KRITIČNO: Dodaj userId
+        task.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
         return task;
     }
 
     private void populateUI() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
 
-        // Naziv
         tvDetailName.setText(currentTask.getName());
 
-        // Opis
         String desc = currentTask.getDescription();
         tvDetailDescription.setText((desc != null && !desc.isEmpty()) ? desc : "—");
 
-        // Kategorija
         tvDetailCategory.setText(currentTask.getCategory());
-
-        // Boja kategorije
         viewCategoryColorBar.setBackgroundColor(currentTask.getCategoryColor());
 
-        // Težina i bitnost
         tvDetailDifficulty.setText(currentTask.getDifficultyLabel() +
                 " (" + currentTask.getDifficultyXP() + " XP)");
         tvDetailImportance.setText(currentTask.getImportanceLabel() +
                 " (" + currentTask.getImportanceXP() + " XP)");
 
-        // Ukupno XP
         tvDetailXP.setText(currentTask.getTotalXP() + " XP");
 
-        // Datum početka
         if (currentTask.getStartDate() != null && currentTask.getStartDate() > 0) {
             tvDetailStartDate.setText(sdf.format(new Date(currentTask.getStartDate())));
         }
 
-        // Datum završetka — samo za ponavljajuće
         if (currentTask.getFrequencyType() == Task.FrequencyType.REPEATING) {
             labelEndDate.setVisibility(View.VISIBLE);
             tvDetailEndDate.setVisibility(View.VISIBLE);
@@ -130,7 +119,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             tvDetailFrequency.setText("Jednokratni");
         }
 
-        // Status i boja
         updateStatusUI(currentTask.getStatus());
     }
 
@@ -140,14 +128,12 @@ public class TaskDetailActivity extends AppCompatActivity {
             case "ACTIVE":
                 tvDetailStatus.setText("AKTIVAN");
                 tvDetailStatus.setBackgroundColor(Color.parseColor("#4CAF50"));
-                // Aktivan — prikaži urađen, pauziraj, otkaži
                 btnMarkDone.setVisibility(View.VISIBLE);
                 btnPause.setVisibility(View.VISIBLE);
                 btnActivate.setVisibility(View.GONE);
                 btnCancel.setVisibility(View.VISIBLE);
                 btnEdit.setVisibility(View.VISIBLE);
                 btnDelete.setVisibility(View.VISIBLE);
-                // Pauza samo za ponavljajuće
                 if (currentTask.getFrequencyType() == Task.FrequencyType.ONE_TIME) {
                     btnPause.setVisibility(View.GONE);
                 }
@@ -155,7 +141,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             case "PAUSED":
                 tvDetailStatus.setText("PAUZIRAN");
                 tvDetailStatus.setBackgroundColor(Color.parseColor("#FF9800"));
-                // Pauziran — prikaži aktiviraj
                 btnMarkDone.setVisibility(View.GONE);
                 btnPause.setVisibility(View.GONE);
                 btnActivate.setVisibility(View.VISIBLE);
@@ -166,7 +151,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             case "DONE":
                 tvDetailStatus.setText("URAĐEN");
                 tvDetailStatus.setBackgroundColor(Color.parseColor("#2196F3"));
-                // Urađen — ništa ne može
                 btnMarkDone.setVisibility(View.GONE);
                 btnPause.setVisibility(View.GONE);
                 btnActivate.setVisibility(View.GONE);
@@ -177,7 +161,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             case "CANCELLED":
                 tvDetailStatus.setText("OTKAZAN");
                 tvDetailStatus.setBackgroundColor(Color.parseColor("#F44336"));
-                // Otkazan — ništa ne može
                 btnMarkDone.setVisibility(View.GONE);
                 btnPause.setVisibility(View.GONE);
                 btnActivate.setVisibility(View.GONE);
@@ -188,7 +171,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             case "UNDONE":
                 tvDetailStatus.setText("NEURAĐEN");
                 tvDetailStatus.setBackgroundColor(Color.parseColor("#9E9E9E"));
-                // Neurađen — ništa ne može
                 btnMarkDone.setVisibility(View.GONE);
                 btnPause.setVisibility(View.GONE);
                 btnActivate.setVisibility(View.GONE);
@@ -201,23 +183,44 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     private void setupButtons() {
 
-        // Označi kao urađen
         btnMarkDone.setOnClickListener(v -> {
+            android.util.Log.d("TASK_DETAIL", "Mark Done clicked!");
+            android.util.Log.d("TASK_DETAIL", "Task: " + currentTask.getName() + ", XP: " + currentTask.getTotalXP());
+            android.util.Log.d("TASK_DETAIL", "UserId: " + currentTask.getUserId());
+
             taskService.markTaskDone(currentTask, new TaskService.OnTaskOperation() {
                 @Override
                 public void onSuccess(String message) {
+                    android.util.Log.d("TASK_DETAIL", "Success: " + message);
                     Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
                     currentTask.setStatus("DONE");
                     updateStatusUI("DONE");
                 }
+
+                @Override
+                public void onLevelUp(int oldLevel, int newLevel, int oldPp, int newPp, String newTitle, int newRequiredXp) {
+                    android.util.Log.d("TASK_DETAIL", "LEVEL UP TRIGGERED!");
+                    Toast.makeText(TaskDetailActivity.this, "LEVEL UP!", Toast.LENGTH_SHORT).show();
+                    currentTask.setStatus("DONE");
+                    updateStatusUI("DONE");
+
+                    Intent intent = new Intent(TaskDetailActivity.this, LevelUpActivity.class);
+                    intent.putExtra("NEW_LEVEL", newLevel);
+                    intent.putExtra("NEW_TITLE", newTitle);
+                    intent.putExtra("OLD_PP", oldPp);
+                    intent.putExtra("NEW_PP", newPp);
+                    intent.putExtra("NEW_REQUIRED_XP", newRequiredXp);
+                    startActivity(intent);
+                }
+
                 @Override
                 public void onError(String message) {
+                    android.util.Log.e("TASK_DETAIL", "Error: " + message);
                     Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
                 }
             });
         });
 
-        // Pauziraj
         btnPause.setOnClickListener(v -> {
             taskService.pauseTask(currentTask, new TaskService.OnTaskOperation() {
                 @Override
@@ -233,7 +236,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             });
         });
 
-        // Aktiviraj (iz pauziranog)
         btnActivate.setOnClickListener(v -> {
             taskService.activateTask(currentTask, new TaskService.OnTaskOperation() {
                 @Override
@@ -249,7 +251,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             });
         });
 
-        // Otkaži
         btnCancel.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Otkaži zadatak")
@@ -272,7 +273,6 @@ public class TaskDetailActivity extends AppCompatActivity {
                     .show();
         });
 
-        // Izmeni
         btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(this, EditTaskActivity.class);
             intent.putExtra("FIRESTORE_ID", currentTask.getFirestoreId());
@@ -285,7 +285,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Obriši
         btnDelete.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Obriši zadatak")
@@ -295,7 +294,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(String message) {
                                 Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
-                                finish(); // Vrati se na listu
+                                finish();
                             }
                             @Override
                             public void onError(String message) {

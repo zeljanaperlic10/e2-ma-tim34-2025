@@ -53,6 +53,30 @@
             android:name=".presentation.CategoriesActivity"
             android:label="Kategorije" />
 
+        <activity
+            android:name=".presentation.CalendarActivity"
+            android:label="Kalendar" />
+
+        <activity
+            android:name=".presentation.StatsActivity"
+            android:label="Statistika" />
+
+        <activity
+            android:name=".presentation.EquipmentSelectorActivity"
+            android:label="Izaberi opremu" />
+
+        <activity
+            android:name=".presentation.BossFightActivity"
+            android:label="Boss Fight" />
+
+        <activity
+            android:name=".presentation.BossVictoryActivity"
+            android:label="Pobeda" />
+
+        <activity
+            android:name=".presentation.LevelUpActivity"
+            android:label="Level Up" />
+
         <activity android:name=".MainActivity" />
 
     </application>

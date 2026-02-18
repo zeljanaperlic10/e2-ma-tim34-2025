@@ -24,6 +24,36 @@
         android:text="Otvori kategorije"
         android:backgroundTint="#4CAF50"
         android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnOpenCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Otvori kalendar"
+        android:backgroundTint="#FF9800"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnOpenStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="📊 Statistika"
+        android:backgroundTint="#9C27B0"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnOpenBossFight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="⚔️ Boss Fight"
+        android:backgroundTint="#F44336"
+        android:textColor="@android:color/white"
         android:textSize="16sp"/>
 
 </LinearLayout>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A2E"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🎉 LEVEL UP!"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="#FFD700"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#2C2C3E"
+        android:padding="24dp"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:id="@+id/tvNewLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nivo 1"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#FFD700"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvNewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ratnik"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nove mogućnosti:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:id="@+id/tvNewPp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚡ PP: 40 → 70"
+            android:textSize="16sp"
+            android:textColor="#2196F3"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvNewRequiredXp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎯 Sledeći nivo: 400 XP"
+            android:textSize="16sp"
+            android:textColor="#FF9800"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvBossUnlocked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💀 Boss Nivo 1 otkljucan!"
+            android:textSize="16sp"
+            android:textColor="#F44336"
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnFightBoss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="⚔️ BORBA SA BOSOM"
+        android:backgroundTint="#F44336"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnContinue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nastavi"
+        android:backgroundTint="#4CAF50"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
+
+</LinearLayout>

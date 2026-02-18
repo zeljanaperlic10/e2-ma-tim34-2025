@@ -12,7 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
+import com.example.myapplication.presentation.CalendarActivity;
 import com.example.myapplication.presentation.CategoriesActivity;
+import com.example.myapplication.presentation.EquipmentSelectorActivity;
+import com.example.myapplication.presentation.StatsActivity;
 import com.example.myapplication.presentation.TaskListActivity;
 
 public class HomeFragment extends Fragment {
@@ -30,6 +33,21 @@ public class HomeFragment extends Fragment {
         Button btnOpenCategories = view.findViewById(R.id.btnOpenCategories);
         btnOpenCategories.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), CategoriesActivity.class));
+        });
+
+        Button btnOpenCalendar = view.findViewById(R.id.btnOpenCalendar);
+        btnOpenCalendar.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), CalendarActivity.class));
+        });
+
+        Button btnOpenStats = view.findViewById(R.id.btnOpenStats);
+        btnOpenStats.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), StatsActivity.class));
+        });
+
+        Button btnOpenBossFight = view.findViewById(R.id.btnOpenBossFight);
+        btnOpenBossFight.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), EquipmentSelectorActivity.class));
         });
 
         return view;

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A2E"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🎉 POBEDA!"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#FFD700"
+        android:layout_marginBottom="24dp"/>
+
+    <ImageView
+        android:id="@+id/ivChest"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@android:drawable/ic_lock_lock"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:id="@+id/tvShakeToOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Protresni telefon da otvoriš kovčeg!"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/layoutRewards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#2C2C3E"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nagrade:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFD700"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:id="@+id/tvCoinsReward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💰 200 novčića"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvEquipmentReward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚔️ Oprema"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zatvori"
+        android:backgroundTint="#4CAF50"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"/>
+
+</LinearLayout>
