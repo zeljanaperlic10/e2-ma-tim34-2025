@@ -103,12 +103,23 @@ public class TaskListActivity extends AppCompatActivity {
             public void onSuccess(List<Task> tasks) {
                 // Prikazuj samo trenutne i buduće zadatke (ne prošle)
                 allTasks.clear();
-                long now = System.currentTimeMillis();
+                // Početak današnjeg dana (00:00:00)
+                java.util.Calendar calToday = java.util.Calendar.getInstance();
+                calToday.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                calToday.set(java.util.Calendar.MINUTE, 0);
+                calToday.set(java.util.Calendar.SECOND, 0);
+                calToday.set(java.util.Calendar.MILLISECOND, 0);
+                long startOfToday = calToday.getTimeInMillis();
+
                 for (Task t : tasks) {
-                    // Preskoci završene prošle zadatke — oni se vide samo u kalendaru
+                    // Neurađeni i otkazani se ne prikazuju u listi
                     if ("UNDONE".equals(t.getStatus()) || "CANCELLED".equals(t.getStatus())) continue;
-                    if (t.getStartDate() != null && t.getStartDate() < now &&
-                            "DONE".equals(t.getStatus())) continue;
+                    // Završeni čiji je datum PRE danas — samo u kalendaru
+                    if ("DONE".equals(t.getStatus()) && t.getStartDate() != null && t.getStartDate() < startOfToday) continue;
+                    // Jednokratni aktivni čiji je datum PRE danas — samo u kalendaru
+                    if ("ACTIVE".equals(t.getStatus())
+                            && t.getFrequencyType() == Task.FrequencyType.ONE_TIME
+                            && t.getStartDate() != null && t.getStartDate() < startOfToday) continue;
                     allTasks.add(t);
                 }
                 // Prikaži tab koji je trenutno selektovan

@@ -66,15 +66,20 @@ public class TaskRepository {
     }
 
     public void deleteFutureRepeatingTasks(String userId, String taskName, long fromDate, OnOperationComplete callback) {
+        // Koristimo client-side filter da izbegnemo potrebu za Firestore kompozitnim indeksom
         db.collection("tasks")
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("name", taskName)
                 .whereEqualTo("frequencyType", "REPEATING")
-                .whereGreaterThanOrEqualTo("startDate", fromDate)
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     for (QueryDocumentSnapshot doc : snapshot) {
-                        doc.getReference().delete();
+                        Task t = doc.toObject(Task.class);
+                        // Brišemo samo buduće (startDate >= fromDate) i nije DONE
+                        if (t.getStartDate() != null && t.getStartDate() >= fromDate
+                                && !"DONE".equals(t.getStatus())) {
+                            doc.getReference().delete();
+                        }
                     }
                     callback.onSuccess();
                 })
@@ -142,4 +147,3 @@ public class TaskRepository {
         void onError(String message);
     }
 }
-

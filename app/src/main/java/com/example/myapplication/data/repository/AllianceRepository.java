@@ -287,6 +287,7 @@ public class AllianceRepository {
                             .addOnSuccessListener(allianceDoc -> {
                                 if (allianceDoc.exists()) {
                                     Alliance alliance = allianceDoc.toObject(Alliance.class);
+                                    if (alliance != null) alliance.setId(allianceDoc.getId()); // Firestore ID
                                     callback.onAllianceLoaded(alliance);
                                 } else {
                                     callback.onAllianceLoaded(null);
@@ -483,8 +484,8 @@ public class AllianceRepository {
                     Boolean missionActive = doc.getBoolean("missionActive");
                     if (missionActive != null && missionActive) { callback.onError("Misija je već aktivna!"); return; }
 
-                    int bossMaxHp = 100 * memberCount;
-                    long missionEndTime = System.currentTimeMillis() + 2L * 60 * 1000; // 2 min demo
+                    int bossMaxHp = 100; // TEST: fiksno 100 HP, vrati na (100 * memberCount) pre odbrane
+                    long missionEndTime = System.currentTimeMillis() + 10L * 60 * 1000; // 10 min demo
 
                     db.collection("alliances").document(allianceId)
                             .update("missionActive", true,

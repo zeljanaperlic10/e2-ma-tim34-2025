@@ -285,16 +285,25 @@ public class AllianceActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess() {
                         messageInput.setText("");
-                        // Misijski doprinos: 4 HP po danu
-                        if (currentAlliance.isMissionActive()) {
-                            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-                            repository.registerMessageDay(currentAlliance.getId(), currentUserId, currentUsername, today,
-                                    new AllianceRepository.OnHpReduced() {
-                                        @Override public void onSuccess(int hp, int newBossHp) {}
-                                        @Override public void onAlreadyMaxed() {}
-                                        @Override public void onError(String e) {}
-                                    });
-                        }
+                        // Čitaj direktno iz Firestore da dobijemo tačan status misije
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                .collection("alliances").document(currentAlliance.getId()).get()
+                                .addOnSuccessListener(doc -> {
+                                    Boolean active = doc.getBoolean("missionActive");
+                                    if (active != null && active) {
+                                        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                                        repository.registerMessageDay(currentAlliance.getId(), currentUserId, currentUsername, today,
+                                                new AllianceRepository.OnHpReduced() {
+                                                    @Override public void onSuccess(int hp, int newBossHp) {
+                                                        Toast.makeText(AllianceActivity.this, "Poruka poslata! Bos HP -" + hp, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    @Override public void onAlreadyMaxed() {
+                                                        Toast.makeText(AllianceActivity.this, "Poruka poslata! (već si doprineo danas)", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    @Override public void onError(String e) {}
+                                                });
+                                    }
+                                });
                     }
                     @Override
                     public void onError(String message) {

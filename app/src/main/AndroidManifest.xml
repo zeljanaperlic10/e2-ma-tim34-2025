@@ -80,6 +80,10 @@
         <activity android:name=".MainActivity" />
 
         <activity
+            android:name=".presentation.AllianceActivity"
+            android:label="Savez" />
+
+        <activity
             android:name=".presentation.MissionProgressActivity"
             android:label="Napredak misije" />
 
