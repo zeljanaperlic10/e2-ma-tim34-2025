@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.data.model.Task;
+import com.example.myapplication.data.repository.AllianceRepository;
 import com.example.myapplication.domain.service.TaskService;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -30,6 +31,7 @@ public class TaskDetailActivity extends AppCompatActivity {
     private Button btnMarkDone, btnPause, btnActivate, btnCancel, btnEdit, btnDelete;
 
     private TaskService taskService = new TaskService();
+    private AllianceRepository allianceRepository = new AllianceRepository();
     private Task currentTask;
 
     @Override
@@ -59,6 +61,37 @@ public class TaskDetailActivity extends AppCompatActivity {
         currentTask = buildTaskFromIntent();
         populateUI();
         setupButtons();
+    }
+
+    /**
+     * Registruje rešen zadatak kao doprinos u specijalnoj misiji saveza (ako postoji).
+     */
+    private void registerTaskInMission(Task task) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    String allianceId = doc.getString("currentAllianceId");
+                    String uname = doc.getString("username");
+                    if (allianceId == null || allianceId.isEmpty()) return;
+
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("alliances").document(allianceId).get()
+                            .addOnSuccessListener(aDoc -> {
+                                Boolean active = aDoc.getBoolean("missionActive");
+                                if (active == null || !active) return;
+
+                                String username = uname != null ? uname : "Korisnik";
+                                allianceRepository.registerTaskCompleted(
+                                        allianceId, uid, username,
+                                        task.getDifficultyXP(), task.getImportanceXP(),
+                                        new com.example.myapplication.data.repository.AllianceRepository.OnHpReduced() {
+                                            @Override public void onSuccess(int hp, int newHp) {}
+                                            @Override public void onAlreadyMaxed() {}
+                                            @Override public void onError(String e) {}
+                                        });
+                            });
+                });
     }
 
     private Task buildTaskFromIntent() {
@@ -195,6 +228,8 @@ public class TaskDetailActivity extends AppCompatActivity {
                     Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
                     currentTask.setStatus("DONE");
                     updateStatusUI("DONE");
+                    // Registruj rešen zadatak za specijalnu misiju saveza
+                    registerTaskInMission(currentTask);
                 }
 
                 @Override

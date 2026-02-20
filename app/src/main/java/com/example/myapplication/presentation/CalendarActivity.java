@@ -107,25 +107,73 @@ public class CalendarActivity extends AppCompatActivity {
         for (Task task : allTasks) {
             if (task.getStartDate() == null) continue;
 
-            Calendar taskCal = Calendar.getInstance();
-            taskCal.setTimeInMillis(task.getStartDate());
-            int taskYear = taskCal.get(Calendar.YEAR);
-            int taskMonth = taskCal.get(Calendar.MONTH);
-            int taskDay = taskCal.get(Calendar.DAY_OF_MONTH);
-
-            if (taskYear == selectedYear && taskMonth == selectedMonth && taskDay == selectedDay) {
-                tasksForDay.add(task);
+            if (task.getFrequencyType() == Task.FrequencyType.ONE_TIME) {
+                // Jednokratni: proveri samo startDate
+                Calendar taskCal = Calendar.getInstance();
+                taskCal.setTimeInMillis(task.getStartDate());
+                if (taskCal.get(Calendar.YEAR) == selectedYear &&
+                        taskCal.get(Calendar.MONTH) == selectedMonth &&
+                        taskCal.get(Calendar.DAY_OF_MONTH) == selectedDay) {
+                    tasksForDay.add(task);
+                }
+            } else if (task.getFrequencyType() == Task.FrequencyType.REPEATING) {
+                // Ponavljajući: generiši sve occurrence datume i provjeri
+                if (taskOccursOnDate(task, selectedYear, selectedMonth, selectedDay)) {
+                    tasksForDay.add(task);
+                }
             }
         }
 
         taskAdapter.updateList(tasksForDay);
 
         if (tasksForDay.isEmpty()) {
-            recyclerCalendarTasks.setVisibility(View.GONE);
-            tvNoTasksForDay.setVisibility(View.VISIBLE);
+            recyclerCalendarTasks.setVisibility(android.view.View.GONE);
+            tvNoTasksForDay.setVisibility(android.view.View.VISIBLE);
         } else {
-            recyclerCalendarTasks.setVisibility(View.VISIBLE);
-            tvNoTasksForDay.setVisibility(View.GONE);
+            recyclerCalendarTasks.setVisibility(android.view.View.VISIBLE);
+            tvNoTasksForDay.setVisibility(android.view.View.GONE);
         }
+    }
+
+    /**
+     * Proverava da li se ponavljajući zadatak pojavljuje na datom datumu.
+     */
+    private boolean taskOccursOnDate(Task task, int selYear, int selMonth, int selDay) {
+        if (task.getRepeatInterval() == null || task.getRepeatUnit() == null) return false;
+
+        Calendar taskStart = Calendar.getInstance();
+        taskStart.setTimeInMillis(task.getStartDate());
+        taskStart.set(Calendar.HOUR_OF_DAY, 0);
+        taskStart.set(Calendar.MINUTE, 0);
+        taskStart.set(Calendar.SECOND, 0);
+        taskStart.set(Calendar.MILLISECOND, 0);
+
+        Calendar selCal = Calendar.getInstance();
+        selCal.set(selYear, selMonth, selDay, 0, 0, 0);
+        selCal.set(Calendar.MILLISECOND, 0);
+
+        // Selektovani datum mora biti >= start datuma
+        if (selCal.before(taskStart)) return false;
+
+        // Provjeri da li nije prošao end datum
+        if (task.getEndDate() != null && task.getEndDate() > 0) {
+            Calendar taskEnd = Calendar.getInstance();
+            taskEnd.setTimeInMillis(task.getEndDate());
+            taskEnd.set(Calendar.HOUR_OF_DAY, 23);
+            if (selCal.after(taskEnd)) return false;
+        }
+
+        // Izračunaj razliku u danima
+        long diffMs = selCal.getTimeInMillis() - taskStart.getTimeInMillis();
+        long diffDays = diffMs / (24L * 60 * 60 * 1000);
+
+        int interval = task.getRepeatInterval();
+        if (task.getRepeatUnit() == Task.RepeatUnit.DAY) {
+            return (diffDays % interval) == 0;
+        } else if (task.getRepeatUnit() == Task.RepeatUnit.WEEK) {
+            // Nedelja = 7 * interval dana
+            return (diffDays % (interval * 7L)) == 0;
+        }
+        return false;
     }
 }

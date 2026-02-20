@@ -471,4 +471,218 @@ public class AllianceRepository {
         void onUsersFound(List<User> users);
         void onError(String message);
     }
+
+    // ============= SPECIJALNA MISIJA =============
+
+    /** Pokreni misiju sa HP = 100 * broj članova, trajanje 2 min (demo umesto 2 nedelje). */
+    public void startMissionWithBoss(String allianceId, String userId, int memberCount, OnOperationComplete callback) {
+        db.collection("alliances").document(allianceId).get()
+                .addOnSuccessListener(doc -> {
+                    String leaderId = doc.getString("leaderId");
+                    if (!leaderId.equals(userId)) { callback.onError("Samo vođa može pokrenuti misiju!"); return; }
+                    Boolean missionActive = doc.getBoolean("missionActive");
+                    if (missionActive != null && missionActive) { callback.onError("Misija je već aktivna!"); return; }
+
+                    int bossMaxHp = 100 * memberCount;
+                    long missionEndTime = System.currentTimeMillis() + 2L * 60 * 1000; // 2 min demo
+
+                    db.collection("alliances").document(allianceId)
+                            .update("missionActive", true,
+                                    "missionEndTime", missionEndTime,
+                                    "missionBossMaxHp", bossMaxHp,
+                                    "missionBossCurrentHp", bossMaxHp,
+                                    "missionStartTime", System.currentTimeMillis())
+                            .addOnSuccessListener(v -> callback.onSuccess())
+                            .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    /** Učitaj doprinos jednog korisnika. */
+    public void getMissionContribution(String allianceId, String userId, OnMissionContributionLoaded callback) {
+        db.collection("alliances").document(allianceId)
+                .collection("contributions").document(userId).get()
+                .addOnSuccessListener(doc -> {
+                    com.example.myapplication.data.model.MissionContribution c =
+                            doc.exists() ? doc.toObject(com.example.myapplication.data.model.MissionContribution.class) : null;
+                    callback.onLoaded(c);
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    /** Učitaj doprinose svih članova. */
+    public void getAllContributions(String allianceId, OnAllContributionsLoaded callback) {
+        db.collection("alliances").document(allianceId).collection("contributions").get()
+                .addOnSuccessListener(snap -> {
+                    List<com.example.myapplication.data.model.MissionContribution> list = new ArrayList<>();
+                    for (DocumentSnapshot d : snap.getDocuments()) {
+                        com.example.myapplication.data.model.MissionContribution mc =
+                                d.toObject(com.example.myapplication.data.model.MissionContribution.class);
+                        if (mc != null) list.add(mc);
+                    }
+                    callback.onLoaded(list);
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    /** Registruj kupovinu u prodavnici (max 5, po 2 HP). */
+    public void registerStorePurchase(String allianceId, String userId, String username, OnHpReduced callback) {
+        loadOrCreateContrib(allianceId, userId, username, contrib -> {
+            if (contrib.getStorePurchases() >= 5) { callback.onAlreadyMaxed(); return; }
+            contrib.setStorePurchases(contrib.getStorePurchases() + 1);
+            saveContribAndReduceHp(allianceId, userId, contrib, 2, callback);
+        }, callback);
+    }
+
+    /** Registruj uspešan udarac u regularnoj borbi (max 10 udarca × 2 HP = max 20 HP). */
+    public void registerSuccessfulBossHit(String allianceId, String userId, String username, OnHpReduced callback) {
+        loadOrCreateContrib(allianceId, userId, username, contrib -> {
+            if (contrib.getSuccessfulHits() >= 10) { callback.onAlreadyMaxed(); return; }
+            contrib.setSuccessfulHits(contrib.getSuccessfulHits() + 1);
+            saveContribAndReduceHp(allianceId, userId, contrib, 2, callback);
+        }, callback);
+    }
+
+    /**
+     * Registruj rešen zadatak.
+     * Lak/normalan/važan (diffXP<=3 ili impXP<=3): lak+normalan=2HP, ostalo=1HP; ukupno max 10 HP.
+     * Ostali zadaci: max 6 puta × 4 HP.
+     */
+    public void registerTaskCompleted(String allianceId, String userId, String username,
+                                      int difficultyXP, int importanceXP, OnHpReduced callback) {
+        loadOrCreateContrib(allianceId, userId, username, contrib -> {
+            boolean isEasy = (difficultyXP <= 3 || importanceXP <= 3);
+            int hpDmg;
+            if (isEasy) {
+                int taskHp = (difficultyXP <= 3 && importanceXP == 1) ? 2 : 1;
+                int remaining = 10 - contrib.getEasyTasksHpContrib();
+                if (remaining <= 0) { callback.onAlreadyMaxed(); return; }
+                hpDmg = Math.min(taskHp, remaining);
+                contrib.setEasyTasksHpContrib(contrib.getEasyTasksHpContrib() + hpDmg);
+            } else {
+                if (contrib.getOtherTasksCount() >= 6) { callback.onAlreadyMaxed(); return; }
+                contrib.setOtherTasksCount(contrib.getOtherTasksCount() + 1);
+                hpDmg = 4;
+            }
+            saveContribAndReduceHp(allianceId, userId, contrib, hpDmg, callback);
+        }, callback);
+    }
+
+    /** Registruj slanje poruke za određeni dan (format "yyyy-MM-dd"). Po danu = 4 HP. */
+    public void registerMessageDay(String allianceId, String userId, String username,
+                                   String day, OnHpReduced callback) {
+        loadOrCreateContrib(allianceId, userId, username, contrib -> {
+            if (contrib.getMessageDays() == null) contrib.setMessageDays(new ArrayList<>());
+            if (contrib.getMessageDays().contains(day)) { callback.onAlreadyMaxed(); return; }
+            contrib.getMessageDays().add(day);
+            saveContribAndReduceHp(allianceId, userId, contrib, 4, callback);
+        }, callback);
+    }
+
+    /** Označi da korisnik ima neurađen zadatak (gubi bonus 10 HP). */
+    public void markUndoneTask(String allianceId, String userId, String username) {
+        loadOrCreateContrib(allianceId, userId, username, contrib -> {
+            if (!contrib.isHasUndoneTask()) {
+                contrib.setHasUndoneTask(true);
+                db.collection("alliances").document(allianceId)
+                        .collection("contributions").document(userId).set(contrib);
+            }
+        }, null);
+    }
+
+    /** Završi misiju: primeni "bez neurađenih" bonus, vrati rezultat. */
+    public void finishMission(String allianceId, OnMissionFinished callback) {
+        db.collection("alliances").document(allianceId).get()
+                .addOnSuccessListener(doc -> {
+                    int currentHp = 0;
+                    Long hpObj = doc.getLong("missionBossCurrentHp");
+                    if (hpObj != null) currentHp = hpObj.intValue();
+                    final int finalHp = currentHp;
+
+                    getAllContributions(allianceId, new OnAllContributionsLoaded() {
+                        @Override
+                        public void onLoaded(List<com.example.myapplication.data.model.MissionContribution> contributions) {
+                            // Svaki ko nije imao neurađen dobija 10 HP bonus
+                            int[] bonusHp = {0};
+                            for (com.example.myapplication.data.model.MissionContribution c : contributions) {
+                                if (!c.isHasUndoneTask()) bonusHp[0] += 10;
+                            }
+                            int finalBossHp = Math.max(0, finalHp - bonusHp[0]);
+                            boolean won = finalBossHp <= 0;
+
+                            db.collection("alliances").document(allianceId)
+                                    .update("missionActive", false, "missionEndTime", 0L,
+                                            "missionBossCurrentHp", finalBossHp);
+                            callback.onFinished(won, contributions);
+                        }
+                        @Override
+                        public void onError(String message) { callback.onError(message); }
+                    });
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    // --- Privatni helper-i za misiju ---
+
+    private interface OnContribLoaded {
+        void onLoaded(com.example.myapplication.data.model.MissionContribution contrib);
+    }
+
+    private void loadOrCreateContrib(String allianceId, String userId, String username,
+                                     OnContribLoaded onLoaded, OnHpReduced errCallback) {
+        db.collection("alliances").document(allianceId)
+                .collection("contributions").document(userId).get()
+                .addOnSuccessListener(doc -> {
+                    com.example.myapplication.data.model.MissionContribution c = doc.exists()
+                            ? doc.toObject(com.example.myapplication.data.model.MissionContribution.class)
+                            : new com.example.myapplication.data.model.MissionContribution(userId, username, allianceId);
+                    if (c == null) c = new com.example.myapplication.data.model.MissionContribution(userId, username, allianceId);
+                    onLoaded.onLoaded(c);
+                })
+                .addOnFailureListener(e -> { if (errCallback != null) errCallback.onError(e.getMessage()); });
+    }
+
+    private void saveContribAndReduceHp(String allianceId, String userId,
+                                        com.example.myapplication.data.model.MissionContribution contrib,
+                                        int hpDmg, OnHpReduced callback) {
+        db.collection("alliances").document(allianceId)
+                .collection("contributions").document(userId).set(contrib)
+                .addOnSuccessListener(v -> {
+                    db.collection("alliances").document(allianceId).get()
+                            .addOnSuccessListener(doc -> {
+                                Long cur = doc.getLong("missionBossCurrentHp");
+                                if (cur == null) { callback.onError("Nema aktivne misije"); return; }
+                                int newHp = Math.max(0, cur.intValue() - hpDmg);
+                                db.collection("alliances").document(allianceId)
+                                        .update("missionBossCurrentHp", newHp)
+                                        .addOnSuccessListener(a -> callback.onSuccess(hpDmg, newHp))
+                                        .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                            })
+                            .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    // --- Interfejsi za misiju ---
+
+    public interface OnMissionContributionLoaded {
+        void onLoaded(com.example.myapplication.data.model.MissionContribution contribution);
+        void onError(String message);
+    }
+
+    public interface OnAllContributionsLoaded {
+        void onLoaded(List<com.example.myapplication.data.model.MissionContribution> contributions);
+        void onError(String message);
+    }
+
+    public interface OnHpReduced {
+        void onSuccess(int hpDamage, int newBossHp);
+        void onAlreadyMaxed();
+        void onError(String message);
+    }
+
+    public interface OnMissionFinished {
+        void onFinished(boolean won, List<com.example.myapplication.data.model.MissionContribution> contributions);
+        void onError(String message);
+    }
 }

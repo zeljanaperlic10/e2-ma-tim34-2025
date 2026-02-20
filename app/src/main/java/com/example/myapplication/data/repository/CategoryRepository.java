@@ -49,7 +49,7 @@ public class CategoryRepository {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    public void updateCategoryColor(String firestoreId, int newColor, String userId, OnOperationComplete callback) {
+    public void updateCategoryColor(String firestoreId, int newColor, String userId, String categoryName, OnOperationComplete callback) {
         // Proveri da li već postoji kategorija sa novom bojom
         db.collection("categories")
                 .whereEqualTo("userId", userId)
@@ -60,9 +60,23 @@ public class CategoryRepository {
                         callback.onError("Već postoji kategorija sa ovom bojom!");
                         return;
                     }
+                    // Ažuriraj boju kategorije
                     db.collection("categories").document(firestoreId)
                             .update("color", newColor)
-                            .addOnSuccessListener(a -> callback.onSuccess())
+                            .addOnSuccessListener(a -> {
+                                // Ažuriraj boje svih zadataka te kategorije
+                                db.collection("tasks")
+                                        .whereEqualTo("userId", userId)
+                                        .whereEqualTo("category", categoryName)
+                                        .get()
+                                        .addOnSuccessListener(taskSnapshot -> {
+                                            for (com.google.firebase.firestore.QueryDocumentSnapshot doc : taskSnapshot) {
+                                                doc.getReference().update("categoryColor", newColor);
+                                            }
+                                            callback.onSuccess();
+                                        })
+                                        .addOnFailureListener(e -> callback.onSuccess()); // Kategorija ažurirana, ignorišemo grešku u zadacima
+                            })
                             .addOnFailureListener(e -> callback.onError(e.getMessage()));
                 })
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));

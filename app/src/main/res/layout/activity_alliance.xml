@@ -5,40 +5,72 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- SAVEZ INFO -->
     <TextView
         android:id="@+id/allianceNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Naziv saveza"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/leaderText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vođa: "
-        android:textSize="16sp"
-        android:layout_marginTop="8dp"/>
+        android:text="Vođa:"
+        android:textSize="15sp"
+        android:layout_marginTop="4dp"/>
 
     <TextView
         android:id="@+id/membersText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Članovi: "
-        android:textSize="14sp"
-        android:layout_marginTop="4dp"/>
+        android:text="Članovi:"
+        android:textSize="13sp"
+        android:layout_marginTop="2dp"/>
 
+    <!-- MISIJA STATUS -->
     <TextView
         android:id="@+id/missionStatusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nema aktivne misije"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textColor="#FF5722"
         android:textStyle="bold"
         android:layout_marginTop="8dp"/>
 
+    <!-- BOSS HP (vidljivo samo kada je misija aktivna) -->
+    <TextView
+        android:id="@+id/tvBossHpLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HP bosa misije:"
+        android:textSize="13sp"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/progressBossHp"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:progressTint="#D32F2F"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tvBossHp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="13sp"
+        android:textColor="#D32F2F"
+        android:layout_marginTop="2dp"
+        android:visibility="gone"/>
+
+    <!-- DUGMAD (Pokreni / Napusti / Ukini / Napredak) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,14 +84,32 @@
             android:layout_weight="1"
             android:text="Pokreni misiju"
             android:visibility="gone"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btnMissionProgress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Napredak misije"
+            android:visibility="gone"
+            android:layout_marginEnd="4dp"/>
 
         <Button
             android:id="@+id/leaveAllianceBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Napusti savez"
+            android:text="Napusti"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnDeleteAlliance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ukini savez"
+            android:backgroundTint="#F44336"
             android:visibility="gone"/>
     </LinearLayout>
 
@@ -67,15 +117,16 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#CCCCCC"
-        android:layout_marginVertical="16dp"/>
+        android:layout_marginVertical="12dp"/>
 
+    <!-- ČET -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Čet"
-        android:textSize="20sp"
+        android:text="Čet saveza"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="6dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
@@ -97,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Upiši poruku..."
-            android:padding="12dp"
+            android:padding="10dp"
             android:layout_marginEnd="8dp"/>
 
         <Button
@@ -107,11 +158,12 @@
             android:text="Pošalji"/>
     </LinearLayout>
 
+    <!-- LISTA ČLANOVA (skrivena, služi adapteru) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/membersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:visibility="gone"/>
 
 </LinearLayout>

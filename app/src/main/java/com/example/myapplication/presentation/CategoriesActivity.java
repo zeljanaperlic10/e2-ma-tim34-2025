@@ -134,7 +134,7 @@ public class CategoriesActivity extends AppCompatActivity {
         builder.setItems(colorNames, (dialog, which) -> {
             int newColor = colors[which];
 
-            categoryRepository.updateCategoryColor(category.getFirestoreId(), newColor, userId,
+            categoryRepository.updateCategoryColor(category.getFirestoreId(), newColor, userId, category.getName(),
                     new CategoryRepository.OnOperationComplete() {
                         @Override
                         public void onSuccess() {

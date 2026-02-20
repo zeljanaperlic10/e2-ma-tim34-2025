@@ -21,12 +21,14 @@ import com.example.myapplication.data.model.Boss;
 import com.example.myapplication.data.model.Equipment;
 import com.example.myapplication.data.model.Task;
 import com.example.myapplication.data.model.User;
+import com.example.myapplication.data.repository.AllianceRepository;
 import com.example.myapplication.data.repository.BossRepository;
 import com.example.myapplication.data.repository.EquipmentRepository;
 import com.example.myapplication.data.repository.TaskRepository;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.util.TaskSuccessCalculator;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,9 @@ public class BossFightActivity extends AppCompatActivity implements SensorEventL
     private UserRepository userRepository = new UserRepository();
     private TaskRepository taskRepository = new TaskRepository();
     private EquipmentRepository equipmentRepository = new EquipmentRepository();
+    private AllianceRepository allianceRepository = new AllianceRepository();
     private String userId;
+    private String username;
 
     private Boss currentBoss;
     private User currentUser;
@@ -67,6 +71,10 @@ public class BossFightActivity extends AppCompatActivity implements SensorEventL
         setContentView(R.layout.activity_boss_fight);
 
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Učitaj username za misijski doprinos
+        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+                .addOnSuccessListener(doc -> username = doc.getString("username"));
 
         tvBossLevel = findViewById(R.id.tvBossLevel);
         tvBossHp = findViewById(R.id.tvBossHp);
@@ -237,6 +245,9 @@ public class BossFightActivity extends AppCompatActivity implements SensorEventL
             int damage = currentUser.getPp() + bonusPp;
             currentBoss.setHp(Math.max(0, currentBoss.getHp() - damage));
             tvBattleLog.setText("💥 Pogodak! Naneto " + damage + " štete!");
+
+            // Registruj uspešan udarac za specijalnu misiju saveza
+            registerHitInMission();
         } else {
             tvBattleLog.setText("❌ Promašaj!");
         }
@@ -261,6 +272,29 @@ public class BossFightActivity extends AppCompatActivity implements SensorEventL
             decreaseEquipmentDurability();
             endBattle();
         }
+    }
+
+    private void registerHitInMission() {
+        // Proveri da li korisnik ima aktivan savez sa misijom
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users").document(userId).get()
+                .addOnSuccessListener(doc -> {
+                    String allianceId = doc.getString("currentAllianceId");
+                    if (allianceId == null || allianceId.isEmpty()) return;
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("alliances").document(allianceId).get()
+                            .addOnSuccessListener(aDoc -> {
+                                Boolean active = aDoc.getBoolean("missionActive");
+                                if (active == null || !active) return;
+                                String uname = username != null ? username : "Korisnik";
+                                allianceRepository.registerSuccessfulBossHit(allianceId, userId, uname,
+                                        new AllianceRepository.OnHpReduced() {
+                                            @Override public void onSuccess(int hp, int newBossHp) {}
+                                            @Override public void onAlreadyMaxed() {}
+                                            @Override public void onError(String e) {}
+                                        });
+                            });
+                });
     }
 
     private void decreaseEquipmentDurability() {
